@@ -1,0 +1,23 @@
+{
+        debug
+        order geofence before respond
+}
+
+localhost:80
+
+route /* {
+        geofence {
+                # Cache ip addresses and if they are within proximity or not
+                cache_ttl 5m
+                # ipstack.com API token, this example reads from an environment variable
+                ipstack_api_token {$IPSTACK_API_TOKEN}
+                # Proximity
+                # 0 - 111 km
+                # 1 - 11.1 km
+                # 2 - 1.11 km
+                # 3 111 meters
+                # 4 11.1 meters
+                # 5 1.11 meters
+                sensitivity 3
+        }
+}
