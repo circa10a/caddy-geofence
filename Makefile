@@ -15,4 +15,4 @@ lint:
 		echo "Need to install golangci-lint";\
 		exit 1;\
 	fi;\
-	golangci-lint run
+	golangci-lint run -v

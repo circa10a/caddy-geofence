@@ -22,16 +22,17 @@ const (
 
 // CaddyGeofence implements IP geofencing functionality.
 type CaddyGeofence struct {
-	// CacheTTL is string parameter for caching ip addresses with their allowed/not allowed state
-	// Not specifying a TTL sets no expiration on cached items and will live until restart
-	// Time format examples include 10s, 10m, 10h, 10d, 10h45m, 1w
-	CacheTTL time.Duration `json:"cache_ttl,omitempty"`
+	GeofenceClient *geofence.Geofence
 	// IPStackAPIToken is REQUIRED and is the API token from ipstack.com
 	// Free tier includes 100 requests per month
 	IPStackAPIToken string `json:"ipstack_api_token,omitempty"`
 	// RemoteIP is the IP address to geofence against
 	// Not specifying this field results in geofencing the public address of the machine caddy is running on
 	RemoteIP string `json:"remote_ip,omitempty"`
+	// CacheTTL is string parameter for caching ip addresses with their allowed/not allowed state
+	// Not specifying a TTL sets no expiration on cached items and will live until restart
+	// Time format examples include 10s, 10m, 10h, 10d, 10h45m, 1w
+	CacheTTL time.Duration `json:"cache_ttl,omitempty"`
 	// Sensitivity is a 0-5 scale of the geofence proximity
 	// 0 - 111 km
 	// 1 - 11.1 km
@@ -39,8 +40,7 @@ type CaddyGeofence struct {
 	// 3 111 meters
 	// 4 11.1 meters
 	// 5 1.11 meters
-	Sensitivity    int `json:"sensitivity,omitempty"`
-	GeofenceClient *geofence.Geofence
+	Sensitivity int `json:"sensitivity,omitempty"`
 }
 
 func init() {
