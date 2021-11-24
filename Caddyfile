@@ -9,8 +9,8 @@ route /* {
         geofence {
                 # Cache ip addresses and if they are within proximity or not
                 cache_ttl 5m
-                # ipstack.com API token, this example reads from an environment variable
-                ipstack_api_token {$IPSTACK_API_TOKEN}
+                # freegeoip.app API token, this example reads from an environment variable
+                freegeoip_api_token {$FREEGEOIP_API_TOKEN}
                 # Proximity
                 # 0 - 111 km
                 # 1 - 11.1 km

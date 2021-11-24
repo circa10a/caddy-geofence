@@ -23,9 +23,9 @@ const (
 // CaddyGeofence implements IP geofencing functionality.
 type CaddyGeofence struct {
 	GeofenceClient *geofence.Geofence
-	// IPStackAPIToken is REQUIRED and is the API token from ipstack.com
-	// Free tier includes 100 requests per month
-	IPStackAPIToken string `json:"ipstack_api_token,omitempty"`
+	// freegeoip_api_token is REQUIRED and is an API token from freegeoip.app
+	// Free tier includes 15000 requests per hour
+	FreeGeoIPAPIToken string `json:"freegeoip_api_token,omitempty"`
 	// RemoteIP is the IP address to geofence against
 	// Not specifying this field results in geofencing the public address of the machine caddy is running on
 	RemoteIP string `json:"remote_ip,omitempty"`
@@ -66,8 +66,8 @@ func isPrivateAddress(addr string) bool {
 
 // Provision implements caddy.Provisioner.
 func (cg *CaddyGeofence) Provision(ctx caddy.Context) error {
-	if cg.IPStackAPIToken == "" {
-		return fmt.Errorf("ipstack_api_token: ipstack API token not set")
+	if cg.FreeGeoIPAPIToken == "" {
+		return fmt.Errorf("freegeoip_api_token: freegeoip API token not set")
 	}
 	// Set cache to never expire if not specified
 	if cg.CacheTTL == 0 {
@@ -79,7 +79,7 @@ func (cg *CaddyGeofence) Provision(ctx caddy.Context) error {
 	}
 
 	// Setup client
-	geofenceClient, err := geofence.New(cg.RemoteIP, cg.IPStackAPIToken, cg.Sensitivity)
+	geofenceClient, err := geofence.New(cg.RemoteIP, cg.FreeGeoIPAPIToken, cg.Sensitivity)
 	if err != nil {
 		return err
 	}

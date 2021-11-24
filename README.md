@@ -1,6 +1,6 @@
 # caddy-geofence
 
-A caddy module for IP geofencing your caddy web server using ipstack.com
+A caddy module for IP geofencing your caddy web server using freegeoip.app
 
 ![Build Status](https://github.com/circa10a/caddy-geofence/workflows/deploy/badge.svg)
 [![Go Report Card](https://goreportcard.com/badge/github.com/circa10a/caddy-geofence)](https://goreportcard.com/report/github.com/circa10a/caddy-geofence)
@@ -21,7 +21,7 @@ A caddy module for IP geofencing your caddy web server using ipstack.com
 ## Usage
 
 1. For an IP that is not within the geofence, `403` will be returned on the matching route.
-2. An API token from [ipstack.com](https://ipstack.com/product) is **required** to run this module.
+2. An API token from [freegeoip.app](https://freegeoip.app/) is **required** to run this module.
 
 > Free tier includes 100 requests per month
 
@@ -35,7 +35,7 @@ xcaddy build --with github.com/circa10a/caddy-geofence
 ### Docker
 
 ```shell
-docker run -v /your/Caddyfile:/etc/caddy/Caddyfile -e IPSTACK_API_TOKEN -p 80:80 -p 443:443 circa10a/caddy-geofence
+docker run -v /your/Caddyfile:/etc/caddy/Caddyfile -e FREEGEOIP_API_TOKEN -p 80:80 -p 443:443 circa10a/caddy-geofence
 ```
 
 ## Caddyfile example
@@ -52,8 +52,8 @@ route /* {
         geofence {
                 # Cache ip addresses and if they are within proximity or not
                 cache_ttl 5m
-                # ipstack.com API token, this example reads from an environment variable
-                ipstack_api_token {$IPSTACK_API_TOKEN}
+                # freegeoip.app API token, this example reads from an environment variable
+                freegeoip_api_token {$FREEGEOIP_API_TOKEN}
                 # Proximity
                 # 0 - 111 km
                 # 1 - 11.1 km

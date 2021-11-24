@@ -30,11 +30,11 @@ func (cg *CaddyGeofence) UnmarshalCaddyfile(d *caddyfile.Dispenser) error {
 					return err
 				}
 				cg.CacheTTL = cacheTTL
-			case "ipstack_api_token":
+			case "freegeoip_api_token":
 				if !d.NextArg() {
 					return d.ArgErr()
 				}
-				cg.IPStackAPIToken = d.Val()
+				cg.FreeGeoIPAPIToken = d.Val()
 			case "remote_IP":
 				if !d.NextArg() {
 					return d.ArgErr()
