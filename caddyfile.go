@@ -52,6 +52,15 @@ func (cg *CaddyGeofence) UnmarshalCaddyfile(d *caddyfile.Dispenser) error {
 					return err
 				}
 				cg.Sensitivity = sensitivity
+			case "allow_private_ip_addresses":
+				if !d.NextArg() {
+					return d.ArgErr()
+				}
+				allowPrivateIPAddresses, err := strconv.ParseBool(d.Val())
+				if err != nil {
+					return err
+				}
+				cg.AllowPrivateIPAddresses = allowPrivateIPAddresses
 			}
 		}
 	}

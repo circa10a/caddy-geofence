@@ -4,7 +4,8 @@ go 1.17
 
 require (
 	github.com/caddyserver/caddy/v2 v2.4.6
-	github.com/circa10a/go-geofence v0.2.1
+	github.com/circa10a/go-geofence v0.2.2
+	go.uber.org/zap v1.19.0
 )
 
 require (
@@ -84,7 +85,6 @@ require (
 	go.step.sm/linkedca v0.5.0 // indirect
 	go.uber.org/atomic v1.7.0 // indirect
 	go.uber.org/multierr v1.6.0 // indirect
-	go.uber.org/zap v1.19.0 // indirect
 	golang.org/x/crypto v0.0.0-20210915214749-c084706c2272 // indirect
 	golang.org/x/mod v0.4.2 // indirect
 	golang.org/x/net v0.0.0-20211123203042-d83791d6bcd9 // indirect

@@ -11,9 +11,11 @@ route /* {
                 # Cache for 7 days, valid time units are "ms", "s", "m", "h"
                 # Not specifying a TTL sets no expiration on cached items and will live until restart
                 cache_ttl 168h
+
                 # freegeoip.app API token, this example reads from an environment variable
                 freegeoip_api_token {$FREEGEOIP_API_TOKEN}
-                # Proximity
+
+                # Sensitivity/Proximity
                 # 0 - 111 km
                 # 1 - 11.1 km
                 # 2 - 1.11 km
@@ -21,5 +23,15 @@ route /* {
                 # 4 11.1 meters
                 # 5 1.11 meters
                 sensitivity 3
+
+               	# AllowPrivateIPAddresses is a boolean for whether or not to allow private ip ranges
+	        # such as 192.X, 172.X, 10.X, [::1] (localhost)
+	        # false by default
+	        # Some cellular networks doing NATing with 172.X addresses, in which case, you may not want to allow
+                allow_private_ip_addresses true
         }
+}
+
+log {
+        output stdout
 }

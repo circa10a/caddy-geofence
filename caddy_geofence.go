@@ -1,6 +1,7 @@
 package caddygeofence
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"strings"
@@ -11,6 +12,7 @@ import (
 	"github.com/caddyserver/caddy/v2/caddyconfig/httpcaddyfile"
 	"github.com/caddyserver/caddy/v2/modules/caddyhttp"
 	"github.com/circa10a/go-geofence"
+	"go.uber.org/zap"
 )
 
 const (
@@ -18,10 +20,13 @@ const (
 	defaultCacheTTL = -1
 	// 100m
 	defaultSensitivity = 3
+	// Logger namespace string
+	loggerNamespace = "geofence"
 )
 
-// CaddyGeofence implements IP geofencing functionality.
+// CaddyGeofence implements IP geofencing functionality. https://github.com/circa10a/caddy-geofence
 type CaddyGeofence struct {
+	logger         *zap.Logger
 	GeofenceClient *geofence.Geofence
 	// freegeoip_api_token is REQUIRED and is an API token from freegeoip.app
 	// Free tier includes 15000 requests per hour
@@ -41,6 +46,11 @@ type CaddyGeofence struct {
 	// 4 11.1 meters
 	// 5 1.11 meters
 	Sensitivity int `json:"sensitivity,omitempty"`
+	// AllowPrivateIPAddresses is a boolean for whether or not to allow private ip ranges
+	// such as 192.X, 172.X, 10.X, [::1] (localhost)
+	// false by default
+	// Some cellular networks doing NATing with 172.X addresses, in which case, you may not want to allow
+	AllowPrivateIPAddresses bool `json:"allow_private_ip_addresses"`
 }
 
 func init() {
@@ -66,13 +76,19 @@ func isPrivateAddress(addr string) bool {
 
 // Provision implements caddy.Provisioner.
 func (cg *CaddyGeofence) Provision(ctx caddy.Context) error {
+	// Instantiate logger
+	cg.logger = caddy.Log()
+
+	// Verify API Token is set
 	if cg.FreeGeoIPAPIToken == "" {
 		return fmt.Errorf("freegeoip_api_token: freegeoip API token not set")
 	}
+
 	// Set cache to never expire if not specified
 	if cg.CacheTTL == 0 {
 		cg.CacheTTL = defaultCacheTTL
 	}
+
 	// Set sensitivity to mid range if not set
 	if cg.Sensitivity == 0 {
 		cg.Sensitivity = defaultSensitivity
@@ -84,6 +100,7 @@ func (cg *CaddyGeofence) Provision(ctx caddy.Context) error {
 		return err
 	}
 	cg.GeofenceClient = geofenceClient
+
 	// Setup cache
 	cg.GeofenceClient.CreateCache(cg.CacheTTL)
 	return nil
@@ -97,19 +114,39 @@ func (cg CaddyGeofence) Validate() error {
 // ServeHTTP implements caddyhttp.MiddlewareHandler.
 func (cg CaddyGeofence) ServeHTTP(w http.ResponseWriter, r *http.Request, next caddyhttp.Handler) error {
 	remoteAddr := r.RemoteAddr
-	// If known private ip, skip
-	if isPrivateAddress(remoteAddr) {
+	// Debug private addresses
+	cg.logger.Debug(loggerNamespace,
+		zap.String("remote_addr", remoteAddr),
+		zap.Bool("is_private_address", isPrivateAddress(remoteAddr)),
+		zap.Bool("is_private_address_allowed", cg.AllowPrivateIPAddresses),
+	)
+
+	// If known private ip and config says to allow
+	if isPrivateAddress(remoteAddr) && cg.AllowPrivateIPAddresses {
 		return next.ServeHTTP(w, r)
 	}
+
 	// Check if address is nearby
 	isAddressNear, err := cg.GeofenceClient.IsIPAddressNear(remoteAddr)
 	if err != nil {
-		return err
+		// go-geofence will complain about [::1] not being a a valid ip which is correct, but we want to ignore it
+		// to prevent more errors in logs
+		if !errors.Is(err, &geofence.ErrInvalidIPAddress{}) && !strings.HasPrefix(remoteAddr, "[::1]") {
+			return err
+		}
 	}
+	// Debug geofencing
+	// Debug private addresses
+	cg.logger.Debug(loggerNamespace,
+		zap.String("remote_addr", remoteAddr),
+		zap.Bool("is_ip_address_near", isAddressNear),
+	)
+
 	// If remote address is not nearby, reject the request
 	if !isAddressNear {
 		return caddyhttp.Error(http.StatusForbidden, nil)
 	}
+
 	return next.ServeHTTP(w, r)
 }
 
