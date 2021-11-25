@@ -4,7 +4,7 @@ go 1.17
 
 require (
 	github.com/caddyserver/caddy/v2 v2.4.6
-	github.com/circa10a/go-geofence v0.2.0
+	github.com/circa10a/go-geofence v0.2.1
 )
 
 require (
