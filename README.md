@@ -23,7 +23,7 @@ A caddy module for IP geofencing your caddy web server using freegeoip.app
 1. For an IP that is not within the geofence, `403` will be returned on the matching route.
 2. An API token from [freegeoip.app](https://freegeoip.app/) is **required** to run this module.
 
-> Free tier includes 100 requests per month
+> Free tier includes 1 requests per month
 
 ### Build with caddy
 
