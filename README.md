@@ -23,7 +23,7 @@ A caddy module for IP geofencing your caddy web server using freegeoip.app
 1. For an IP that is not within the geofence, `403` will be returned on the matching route.
 2. An API token from [freegeoip.app](https://freegeoip.app/) is **required** to run this module.
 
-> Free tier includes 1 requests per month
+> Free tier includes 15,000 requests per hour
 
 ### Build with caddy
 
@@ -51,7 +51,9 @@ localhost:80
 route /* {
         geofence {
                 # Cache ip addresses and if they are within proximity or not
-                cache_ttl 5m
+                # Cache for 7 days, valid time units are "ms", "s", "m", "h"
+                # Not specifying a TTL sets no expiration on cached items and will live until restart
+                cache_ttl 168h
                 # freegeoip.app API token, this example reads from an environment variable
                 freegeoip_api_token {$FREEGEOIP_API_TOKEN}
                 # Proximity
@@ -73,7 +75,7 @@ Requires [xcaddy](https://caddyserver.com/docs/build#xcaddy) to be installed
 ### Run
 
 ```shell
-export IP_STACK_API_TOKEN=<token>
+export FREEGEOIP_API_TOKEN=<token>
 make run
 ```
 

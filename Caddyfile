@@ -8,7 +8,9 @@ localhost:80
 route /* {
         geofence {
                 # Cache ip addresses and if they are within proximity or not
-                cache_ttl 5m
+                # Cache for 7 days, valid time units are "ms", "s", "m", "h"
+                # Not specifying a TTL sets no expiration on cached items and will live until restart
+                cache_ttl 168h
                 # freegeoip.app API token, this example reads from an environment variable
                 freegeoip_api_token {$FREEGEOIP_API_TOKEN}
                 # Proximity

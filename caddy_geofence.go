@@ -31,7 +31,7 @@ type CaddyGeofence struct {
 	RemoteIP string `json:"remote_ip,omitempty"`
 	// CacheTTL is string parameter for caching ip addresses with their allowed/not allowed state
 	// Not specifying a TTL sets no expiration on cached items and will live until restart
-	// Time format examples include 10s, 10m, 10h, 10d, 10h45m, 1w
+	// Valid time units are "ms", "s", "m", "h"
 	CacheTTL time.Duration `json:"cache_ttl,omitempty"`
 	// Sensitivity is a 0-5 scale of the geofence proximity
 	// 0 - 111 km
