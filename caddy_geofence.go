@@ -95,14 +95,17 @@ func (cg *CaddyGeofence) Provision(ctx caddy.Context) error {
 	}
 
 	// Setup client
-	geofenceClient, err := geofence.New(cg.RemoteIP, cg.FreeGeoIPAPIToken, cg.Sensitivity)
+	geofenceClient, err := geofence.New(&geofence.Config{
+		IPAddress:   cg.RemoteIP,
+		Token:       cg.FreeGeoIPAPIToken,
+		Sensitivity: cg.Sensitivity,
+		CacheTTL:    cg.CacheTTL,
+	})
 	if err != nil {
 		return err
 	}
-	cg.GeofenceClient = geofenceClient
 
-	// Setup cache
-	cg.GeofenceClient.CreateCache(cg.CacheTTL)
+	cg.GeofenceClient = geofenceClient
 	return nil
 }
 
