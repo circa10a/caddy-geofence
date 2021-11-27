@@ -1,8 +1,8 @@
 package caddygeofence
 
 import (
-	"errors"
 	"fmt"
+	"net"
 	"net/http"
 	"strings"
 	"time"
@@ -71,7 +71,7 @@ func isPrivateAddress(addr string) bool {
 	return strings.HasPrefix(addr, "192.") ||
 		strings.HasPrefix(addr, "172.") ||
 		strings.HasPrefix(addr, "10.") ||
-		strings.HasPrefix(addr, "[::1]")
+		strings.HasPrefix(addr, "::1")
 }
 
 // Provision implements caddy.Provisioner.
@@ -116,7 +116,12 @@ func (cg CaddyGeofence) Validate() error {
 
 // ServeHTTP implements caddyhttp.MiddlewareHandler.
 func (cg CaddyGeofence) ServeHTTP(w http.ResponseWriter, r *http.Request, next caddyhttp.Handler) error {
-	remoteAddr := r.RemoteAddr
+	// Get host address, can  contain a port so we make sure strip that off
+	remoteAddr, _, err := net.SplitHostPort(r.RemoteAddr)
+	if err != nil {
+		return err
+	}
+
 	// Debug private addresses
 	cg.logger.Debug(loggerNamespace,
 		zap.String("remote_addr", remoteAddr),
@@ -132,14 +137,10 @@ func (cg CaddyGeofence) ServeHTTP(w http.ResponseWriter, r *http.Request, next c
 	// Check if address is nearby
 	isAddressNear, err := cg.GeofenceClient.IsIPAddressNear(remoteAddr)
 	if err != nil {
-		// go-geofence will complain about [::1] not being a a valid ip which is correct, but we want to ignore it
-		// to prevent more errors in logs
-		if !errors.Is(err, &geofence.ErrInvalidIPAddress{}) && !strings.HasPrefix(remoteAddr, "[::1]") {
-			return err
-		}
+		return err
 	}
+
 	// Debug geofencing
-	// Debug private addresses
 	cg.logger.Debug(loggerNamespace,
 		zap.String("remote_addr", remoteAddr),
 		zap.Bool("is_ip_address_near", isAddressNear),

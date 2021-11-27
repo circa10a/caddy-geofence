@@ -194,6 +194,8 @@ github.com/circa10a/go-geofence v0.2.2 h1:5oQ2X++fMsB1yCsesDI2ThmvGJjZSeqO9GiYOd
 github.com/circa10a/go-geofence v0.2.2/go.mod h1:ngFR0sZiPl8QbbIm6TNCnSVppyyvP8SNbbXQ3sAJALw=
 github.com/circa10a/go-geofence v0.3.0 h1:s0I9BSMUJyLymolWREK9Iu/Vek+ecGEPp86gLuiNYFg=
 github.com/circa10a/go-geofence v0.3.0/go.mod h1:0DFACqglBg6J36ksSzUpCdyBQlxEavqEbw3Yz/Otdic=
+github.com/circa10a/go-geofence v0.3.1 h1:UvKkNBFe5uqaUdDt4jK1uPLtVXaJMdN5l2BA+jwS+aY=
+github.com/circa10a/go-geofence v0.3.1/go.mod h1:0DFACqglBg6J36ksSzUpCdyBQlxEavqEbw3Yz/Otdic=
 github.com/clbanning/x2j v0.0.0-20191024224557-825249438eec/go.mod h1:jMjuTZXRI4dUb/I5gc9Hdhagfvm9+RyrPryS/auMzxE=
 github.com/client9/misspell v0.3.4/go.mod h1:qj6jICC3Q7zFZvVWo7KLAzC3yx5G7kyvSDkc90ppPyw=
 github.com/cncf/udpa/go v0.0.0-20191209042840-269d4d468f6f/go.mod h1:M8M6+tZqaGXZJjfX53e64911xZQV5JYwmTeXPW+k8Sc=
