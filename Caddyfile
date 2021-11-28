@@ -3,7 +3,7 @@
 	order geofence before respond
 }
 
-localhost:80
+:80
 
 route /* {
 	geofence {

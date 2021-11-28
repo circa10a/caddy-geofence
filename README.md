@@ -35,7 +35,7 @@ xcaddy build --with github.com/circa10a/caddy-geofence
 ### Docker
 
 ```shell
-docker run -v /your/Caddyfile:/etc/caddy/Caddyfile -e FREEGEOIP_API_TOKEN -p 80:80 -p 443:443 circa10a/caddy-geofence
+docker run --net host -v /your/Caddyfile:/etc/caddy/Caddyfile -e FREEGEOIP_API_TOKEN -p 80:80 -p 443:443 circa10a/caddy-geofence
 ```
 
 ## Caddyfile example
@@ -46,7 +46,7 @@ docker run -v /your/Caddyfile:/etc/caddy/Caddyfile -e FREEGEOIP_API_TOKEN -p 80:
 	order geofence before respond
 }
 
-localhost:80
+:80
 
 route /* {
 	geofence {
