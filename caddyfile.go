@@ -35,14 +35,28 @@ func (cg *CaddyGeofence) UnmarshalCaddyfile(d *caddyfile.Dispenser) error {
 					return d.ArgErr()
 				}
 				cg.FreeGeoIPAPIToken = d.Val()
-			case "remote_IP":
+			case "remote_ip":
 				if !d.NextArg() {
 					return d.ArgErr()
 				}
 				if net.ParseIP(d.Val()) == nil {
-					return fmt.Errorf("remote_ip: invalid IPv4 address provided")
+					return fmt.Errorf("remote_ip: invalid IP address provided")
 				}
 				cg.RemoteIP = d.Val()
+			case "allowlist":
+				cg.Allowlist = d.RemainingArgs()
+				if len(cg.Allowlist) == 0 {
+					return d.ArgErr()
+				}
+			case "status_code":
+				if !d.NextArg() {
+					return d.ArgErr()
+				}
+				statusCode, err := strconv.Atoi(d.Val())
+				if err != nil {
+					return err
+				}
+				cg.StatusCode = statusCode
 			case "sensitivity":
 				if !d.NextArg() {
 					return d.ArgErr()
