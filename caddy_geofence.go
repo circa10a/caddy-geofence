@@ -17,8 +17,6 @@ import (
 const (
 	// Infinite
 	defaultCacheTTL = -1
-	// 100m
-	defaultSensitivity = 3
 	// 403
 	defaultStatusCode = http.StatusForbidden
 	// Logger namespace string
@@ -43,14 +41,10 @@ type CaddyGeofence struct {
 	// Not specifying a TTL sets no expiration on cached items and will live until restart
 	// Valid time units are "ms", "s", "m", "h"
 	CacheTTL time.Duration `json:"cache_ttl,omitempty"`
-	// sensitivity is a 0-5 scale of the geofence proximity
-	// 0 - 111 km
-	// 1 - 11.1 km
-	// 2 - 1.11 km
-	// 3 111 meters
-	// 4 11.1 meters
-	// 5 1.11 meters
-	Sensitivity int `json:"sensitivity,omitempty"`
+	// radius is the distance of the geofence in kilometers
+	// If not supplied, will default to 0.0 kilometers
+	// 1.0 => 1.0 kilometers
+	Radius float64 `json:"radius"`
 	// allow_private_ip_addresses is a boolean for whether or not to allow private ip ranges
 	// such as 192.X, 172.X, 10.X, [::1] (localhost)
 	// false by default
@@ -86,11 +80,6 @@ func (cg *CaddyGeofence) Provision(ctx caddy.Context) error {
 		cg.CacheTTL = defaultCacheTTL
 	}
 
-	// Set sensitivity to mid range if not set
-	if cg.Sensitivity == 0 {
-		cg.Sensitivity = defaultSensitivity
-	}
-
 	// Set default status code if not set (403)
 	if cg.StatusCode == 0 {
 		cg.StatusCode = defaultStatusCode
@@ -98,10 +87,10 @@ func (cg *CaddyGeofence) Provision(ctx caddy.Context) error {
 
 	// Setup client
 	geofenceClient, err := geofence.New(&geofence.Config{
-		IPAddress:   cg.RemoteIP,
-		Token:       cg.FreeGeoIPAPIToken,
-		Sensitivity: cg.Sensitivity,
-		CacheTTL:    cg.CacheTTL,
+		IPAddress: cg.RemoteIP,
+		Token:     cg.FreeGeoIPAPIToken,
+		Radius:    cg.Radius,
+		CacheTTL:  cg.CacheTTL,
 	})
 	if err != nil {
 		return err

@@ -15,14 +15,9 @@ route /* {
 		# freegeoip.app API token, this example reads from an environment variable
 		freegeoip_api_token {$FREEGEOIP_API_TOKEN}
 
-		# sensitivity (proximity)
-		# 0 - 111 km
-		# 1 - 11.1 km
-		# 2 - 1.11 km
-		# 3 111 meters
-		# 4 11.1 meters
-		# 5 1.11 meters
-		sensitivity 3
+		# radius is the the distance of the geofence, only clients within the distance will be allowed.
+		# If not supplied, will default to 0.0 kilometers
+		radius 1.0
 
 		# allow_private_ip_addresses is a boolean for whether or not to allow private ip ranges
 		# such as 192.X, 172.X, 10.X, [::1] (localhost)

@@ -57,15 +57,15 @@ func (cg *CaddyGeofence) UnmarshalCaddyfile(d *caddyfile.Dispenser) error {
 					return err
 				}
 				cg.StatusCode = statusCode
-			case "sensitivity":
+			case "radius":
 				if !d.NextArg() {
 					return d.ArgErr()
 				}
-				sensitivity, err := strconv.Atoi(d.Val())
+				radius, err := strconv.ParseFloat(d.Val(), 64)
 				if err != nil {
 					return err
 				}
-				cg.Sensitivity = sensitivity
+				cg.Radius = radius
 			case "allow_private_ip_addresses":
 				if !d.NextArg() {
 					return d.ArgErr()
