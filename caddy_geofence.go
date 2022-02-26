@@ -87,10 +87,11 @@ func (cg *CaddyGeofence) Provision(ctx caddy.Context) error {
 
 	// Setup client
 	geofenceClient, err := geofence.New(&geofence.Config{
-		IPAddress: cg.RemoteIP,
-		Token:     cg.FreeGeoIPAPIToken,
-		Radius:    cg.Radius,
-		CacheTTL:  cg.CacheTTL,
+		IPAddress:               cg.RemoteIP,
+		Token:                   cg.FreeGeoIPAPIToken,
+		Radius:                  cg.Radius,
+		AllowPrivateIPAddresses: cg.AllowPrivateIPAddresses,
+		CacheTTL:                cg.CacheTTL,
 	})
 	if err != nil {
 		return err
@@ -119,18 +120,12 @@ func (cg CaddyGeofence) ServeHTTP(w http.ResponseWriter, r *http.Request, next c
 	// Debug private address/allowlist rules
 	cg.logger.Debug(loggerNamespace,
 		zap.String("remote_addr", remoteAddr),
-		zap.Bool("is_private_address", isPrivateAddress(remoteAddr)),
 		zap.Bool("is_private_address_allowed", cg.AllowPrivateIPAddresses),
 		zap.Bool("is_in_allowlist", inAllowlist),
 	)
 
 	// If ip address is in allowlist, continue
 	if inAllowlist {
-		return next.ServeHTTP(w, r)
-	}
-
-	// If known private ip address and config says to allow private ip addresses
-	if isPrivateAddress(remoteAddr) && cg.AllowPrivateIPAddresses {
 		return next.ServeHTTP(w, r)
 	}
 
@@ -152,12 +147,6 @@ func (cg CaddyGeofence) ServeHTTP(w http.ResponseWriter, r *http.Request, next c
 	}
 
 	return next.ServeHTTP(w, r)
-}
-
-// isPrivateAddress checks if remote address is from known private ip space
-func isPrivateAddress(addr string) bool {
-	ip := net.ParseIP(addr)
-	return ip.IsPrivate() || ip.IsLoopback()
 }
 
 // strInSlice returns true if string is in slice
