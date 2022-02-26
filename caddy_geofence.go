@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"net"
 	"net/http"
-	"strings"
 	"time"
 
 	"github.com/caddyserver/caddy/v2"
@@ -158,7 +157,7 @@ func (cg CaddyGeofence) ServeHTTP(w http.ResponseWriter, r *http.Request, next c
 // isPrivateAddress checks if remote address is from known private ip space
 func isPrivateAddress(addr string) bool {
 	ip := net.ParseIP(addr)
-	return ip.IsPrivate() || strings.HasPrefix(addr, "::1")
+	return ip.IsPrivate() || ip.IsLoopback()
 }
 
 // strInSlice returns true if string is in slice
