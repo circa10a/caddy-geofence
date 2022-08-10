@@ -1,6 +1,6 @@
 # caddy-geofence
 
-A caddy module for IP geofencing your caddy web server using freegeoip.app
+A caddy module for IP geofencing your caddy web server using https://ipbase.com/
 
 ![Build Status](https://github.com/circa10a/caddy-geofence/workflows/deploy/badge.svg)
 [![Go Report Card](https://goreportcard.com/badge/github.com/circa10a/caddy-geofence)](https://goreportcard.com/report/github.com/circa10a/caddy-geofence)
@@ -21,9 +21,9 @@ A caddy module for IP geofencing your caddy web server using freegeoip.app
 ## Usage
 
 1. For an IP that is not within the geofence, `403` will be returned on the matching route.
-2. An API token from [freegeoip.app](https://freegeoip.app/) is **required** to run this module.
+2. An API token from [ipbase.com](https://ipbase.com/) is **required** to run this module.
 
-> Free tier includes 15,000 requests per hour
+> Free tier includes 150 requests per month
 
 ### Build with caddy
 
@@ -35,7 +35,7 @@ xcaddy build --with github.com/circa10a/caddy-geofence
 ### Docker
 
 ```shell
-docker run --net host -v /your/Caddyfile:/etc/caddy/Caddyfile -e FREEGEOIP_API_TOKEN -p 80:80 -p 443:443 circa10a/caddy-geofence
+docker run --net host -v /your/Caddyfile:/etc/caddy/Caddyfile -e IPBASE_API_TOKEN -p 80:80 -p 443:443 circa10a/caddy-geofence
 ```
 
 ## Caddyfile example
@@ -55,8 +55,8 @@ route /* {
 		# Not specifying a TTL sets no expiration on cached items and will live until restart
 		cache_ttl 168h
 
-		# freegeoip.app API token, this example reads from an environment variable
-		freegeoip_api_token {$FREEGEOIP_API_TOKEN}
+		# ipbase.com API token, this example reads from an environment variable
+		ipbase_api_token {$IPBASE_API_TOKEN}
 
 		// radius is the distance of the geofence in kilometers
 		// If not supplied, will default to 0.0 kilometers
@@ -89,7 +89,7 @@ Requires [xcaddy](https://caddyserver.com/docs/build#xcaddy) to be installed
 ### Run
 
 ```shell
-export FREEGEOIP_API_TOKEN=<token>
+export IPBASE_API_TOKEN=<token>
 make run
 ```
 

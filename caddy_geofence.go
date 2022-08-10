@@ -27,9 +27,9 @@ const (
 type CaddyGeofence struct {
 	logger         *zap.Logger
 	GeofenceClient *geofence.Geofence
-	// freegeoip_api_token is REQUIRED and is an API token from freegeoip.app
-	// Free tier includes 15000 requests per hour
-	FreeGeoIPAPIToken string `json:"freegeoip_api_token,omitempty"`
+	// ipbase_api_token is REQUIRED and is an API token ipbase.com
+	// Free tier includes 150 requests per month
+	IPBaseAPIToken string `json:"ipbase_api_token,omitempty"`
 	// remote_ip is the IP address to geofence against
 	// Not specifying this field results in geofencing the public address of the machine caddy is running on
 	RemoteIP string `json:"remote_ip,omitempty"`
@@ -71,8 +71,8 @@ func (cg *CaddyGeofence) Provision(ctx caddy.Context) error {
 	cg.logger = caddy.Log()
 
 	// Verify API Token is set
-	if cg.FreeGeoIPAPIToken == "" {
-		return fmt.Errorf("freegeoip_api_token: freegeoip API token not set")
+	if cg.IPBaseAPIToken == "" {
+		return fmt.Errorf("ipbase_api_token: ipbase.com API token not set")
 	}
 
 	// Set cache to never expire if not set
@@ -88,7 +88,7 @@ func (cg *CaddyGeofence) Provision(ctx caddy.Context) error {
 	// Setup client
 	geofenceClient, err := geofence.New(&geofence.Config{
 		IPAddress:               cg.RemoteIP,
-		Token:                   cg.FreeGeoIPAPIToken,
+		Token:                   cg.IPBaseAPIToken,
 		Radius:                  cg.Radius,
 		AllowPrivateIPAddresses: cg.AllowPrivateIPAddresses,
 		CacheTTL:                cg.CacheTTL,
