@@ -11,6 +11,7 @@ import (
 	"github.com/caddyserver/caddy/v2/caddyconfig/httpcaddyfile"
 	"github.com/caddyserver/caddy/v2/modules/caddyhttp"
 	"github.com/circa10a/go-geofence"
+	"github.com/go-redis/redis/v9"
 	"go.uber.org/zap"
 )
 
@@ -19,6 +20,8 @@ const (
 	defaultCacheTTL = -1
 	// 403
 	defaultStatusCode = http.StatusForbidden
+	// Localhost for default redis instance
+	defaultRedisAddr = "localhost:6379"
 	// Logger namespace string
 	loggerNamespace = "geofence"
 )
@@ -26,7 +29,7 @@ const (
 // CaddyGeofence implements IP geofencing functionality. https://github.com/circa10a/caddy-geofence
 type CaddyGeofence struct {
 	logger         *zap.Logger
-	GeofenceClient *geofence.Geofence
+	geofenceClient *geofence.Geofence
 	// ipbase_api_token is REQUIRED and is an API token ipbase.com
 	// Free tier includes 150 requests per month
 	IPBaseAPIToken string `json:"ipbase_api_token,omitempty"`
@@ -40,16 +43,26 @@ type CaddyGeofence struct {
 	// cache_ttl is string parameter for caching ip addresses with their allowed/not allowed state
 	// Not specifying a TTL sets no expiration on cached items and will live until restart
 	// Valid time units are "ms", "s", "m", "h"
+	// In-memory cache is used if redis is not enabled
 	CacheTTL time.Duration `json:"cache_ttl,omitempty"`
 	// radius is the distance of the geofence in kilometers
 	// If not supplied, will default to 0.0 kilometers
 	// 1.0 => 1.0 kilometers
 	Radius float64 `json:"radius"`
 	// allow_private_ip_addresses is a boolean for whether or not to allow private ip ranges
-	// such as 192.X, 172.X, 10.X, [::1] (localhost)
-	// false by default
+	// such as 192.X, 172.X, 10.X, [::1] (localhost). Default is false
 	// Some cellular networks doing NATing with 172.X addresses, in which case, you may not want to allow
 	AllowPrivateIPAddresses bool `json:"allow_private_ip_addresses"`
+	// RedisEnabled uses redis for caching. Default is false
+	RedisEnabled bool `json:"redis_enabled,omitempty"`
+	// RedisUsername is the username to connect to a redis instance. Default is ""
+	RedisUsername string `json:"redis_username,omitempty"`
+	// RedisPassword is the password to connect to a redis instance. Default is ""
+	RedisPassword string `json:"redis_password,omitempty"`
+	// RedisAddr is the address to connect to a redis instance. Default is localhost:6379
+	RedisAddr string `json:"redis_addr,omitempty"`
+	// RedisDB is the db id. Default is 0
+	RedisDB int `json:"redis_db,omitempty"`
 }
 
 func init() {
@@ -85,19 +98,37 @@ func (cg *CaddyGeofence) Provision(ctx caddy.Context) error {
 		cg.StatusCode = defaultStatusCode
 	}
 
-	// Setup client
-	geofenceClient, err := geofence.New(&geofence.Config{
+	// Setup base client options
+	geofenceConfig := &geofence.Config{
 		IPAddress:               cg.RemoteIP,
 		Token:                   cg.IPBaseAPIToken,
 		Radius:                  cg.Radius,
 		AllowPrivateIPAddresses: cg.AllowPrivateIPAddresses,
 		CacheTTL:                cg.CacheTTL,
-	})
+	}
+
+	// Setup redis
+	// Set default redis addr if empty
+	if cg.RedisAddr == "" {
+		cg.RedisAddr = defaultRedisAddr
+	}
+
+	// If redis is enabled, set the options for go-geofence to create the client
+	if cg.RedisEnabled {
+		geofenceConfig.RedisOptions = &redis.Options{
+			Addr:     cg.RedisAddr,
+			Username: cg.RedisUsername,
+			Password: cg.RedisPassword,
+			DB:       cg.RedisDB,
+		}
+	}
+
+	geofenceClient, err := geofence.New(geofenceConfig)
 	if err != nil {
 		return err
 	}
 
-	cg.GeofenceClient = geofenceClient
+	cg.geofenceClient = geofenceClient
 	return nil
 }
 
@@ -130,7 +161,7 @@ func (cg CaddyGeofence) ServeHTTP(w http.ResponseWriter, r *http.Request, next c
 	}
 
 	// Check if ip address is nearby
-	isAddressNear, err := cg.GeofenceClient.IsIPAddressNear(remoteAddr)
+	isAddressNear, err := cg.geofenceClient.IsIPAddressNear(remoteAddr)
 	if err != nil {
 		return err
 	}

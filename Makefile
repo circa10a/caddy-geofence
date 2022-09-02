@@ -16,3 +16,10 @@ lint:
 		exit 1;\
 	fi;\
 	golangci-lint run -v
+
+build-linux: export GOOS = linux
+build-linux:
+	xcaddy build --with github.com/$(PROJECT)=./
+
+redis: build-linux
+	docker-compose up

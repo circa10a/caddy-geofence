@@ -75,6 +75,39 @@ func (cg *CaddyGeofence) UnmarshalCaddyfile(d *caddyfile.Dispenser) error {
 					return err
 				}
 				cg.AllowPrivateIPAddresses = allowPrivateIPAddresses
+			case "redis_enabled":
+				if !d.NextArg() {
+					return d.ArgErr()
+				}
+				redisEnabled, err := strconv.ParseBool(d.Val())
+				if err != nil {
+					return err
+				}
+				cg.RedisEnabled = redisEnabled
+			case "redis_username":
+				if !d.NextArg() {
+					return d.ArgErr()
+				}
+				cg.RedisUsername = d.Val()
+			case "redis_password":
+				if !d.NextArg() {
+					return d.ArgErr()
+				}
+				cg.RedisPassword = d.Val()
+			case "redis_addr":
+				if !d.NextArg() {
+					return d.ArgErr()
+				}
+				cg.RedisAddr = d.Val()
+			case "redis_db":
+				if !d.NextArg() {
+					return d.ArgErr()
+				}
+				redisDB, err := strconv.Atoi(d.Val())
+				if err != nil {
+					return err
+				}
+				cg.RedisDB = redisDB
 			}
 		}
 	}

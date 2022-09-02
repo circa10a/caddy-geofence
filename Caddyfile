@@ -30,6 +30,22 @@ route /* {
 
 		# status_code is the HTTP response code that is returned if IP address is not within proximity. Default is 403
 		status_code 403
+
+		# redis_enabled disables the in-memory cache and will connect to a remote redis instance
+		# default is false
+		redis_enabled true
+		# the <host>:<port> of the remote redis instance
+		# default is localhost:6379
+		redis_addr redis:6379
+		# redis_username is the username to connect to a secured redis instance
+		# default is ""
+		redis_username user
+		# redis_password is the password to connect to a secured redis instance
+		# default is ""
+		redis_password password
+		# redis_db is the id of the redis db to connect to to store cache ip addresses
+		# default is 0
+		redis_db 0
 	}
 }
 

@@ -23,6 +23,10 @@ A caddy module for IP geofencing your caddy web server using https://ipbase.com/
 1. For an IP that is not within the geofence, `403` will be returned on the matching route.
 2. An API token from [ipbase.com](https://ipbase.com/) is **required** to run this module.
 
+## Caching
+
+This module by default will use a configurable in-memory cache, should you need an external/persistent cache, the module supports [redis](https://redis.io/). See the caddyfile exmaple below for how to enable.
+
 > Free tier includes 150 requests per month
 
 ### Build with caddy
@@ -58,9 +62,9 @@ route /* {
 		# ipbase.com API token, this example reads from an environment variable
 		ipbase_api_token {$IPBASE_API_TOKEN}
 
-		// radius is the distance of the geofence in kilometers
-		// If not supplied, will default to 0.0 kilometers
-		// 1.0 => 1.0 kilometers
+		# radius is the distance of the geofence in kilometers
+		# If not supplied, will default to 0.0 kilometers
+		# 1.0 => 1.0 kilometers
 		radius 1.0
 
 		# allow_private_ip_addresses is a boolean for whether or not to allow private ip ranges
@@ -74,6 +78,22 @@ route /* {
 
 		# status_code is the HTTP response code that is returned if IP address is not within proximity. Default is 403
 		status_code 403
+
+		# redis_enabled disables the in-memory cache and will connect to a remote redis instance
+		# default is false
+		redis_enabled true
+		# the <host>:<port> of the remote redis instance
+		# default is localhost:6379
+		redis_addr redis:6379
+		# redis_username is the username to connect to a secured redis instance
+		# default is ""
+		redis_username user
+		# redis_password is the password to connect to a secured redis instance
+		# default is ""
+		redis_password password
+		# redis_db is the id of the redis db to connect to to store cache ip addresses
+		# default is 0
+		redis_db 0
 	}
 }
 
@@ -97,4 +117,11 @@ make run
 
 ```shell
 make build
+```
+
+### Run redis enabled stack
+
+```shell
+export IPBASE_API_TOKEN=<token>
+make redis
 ```
