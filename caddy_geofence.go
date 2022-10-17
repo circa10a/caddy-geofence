@@ -30,38 +30,38 @@ const (
 type CaddyGeofence struct {
 	logger         *zap.Logger
 	geofenceClient *geofence.Geofence
-	// ipbase_api_token is REQUIRED and is an API token ipbase.com
-	// Free tier includes 150 requests per month
+	// ipbase_api_token is REQUIRED and is an API token ipbase.com.
+	// Free tier includes 150 requests per month.
 	IPBaseAPIToken string `json:"ipbase_api_token,omitempty"`
-	// remote_ip is the IP address to geofence against
-	// Not specifying this field results in geofencing the public address of the machine caddy is running on
+	// remote_ip is the IP address to geofence against.
+	// Not specifying this field results in geofencing the public address of the machine caddy is running on.
 	RemoteIP string `json:"remote_ip,omitempty"`
-	// allowlist is a list of IP addresses that will not be checked for proximity and will be allowed to access the server
+	// allowlist is a list of IP addresses that will not be checked for proximity and will be allowed to access the server.
 	Allowlist []string `json:"allowlist,omitempty"`
-	// status_code is the HTTP response code that is returned if IP address is not within proximity. Default is 403
+	// status_code is the HTTP response code that is returned if IP address is not within proximity. Default is 403.
 	StatusCode int `json:"status_code,omitempty"`
-	// cache_ttl is string parameter for caching ip addresses with their allowed/not allowed state
-	// Not specifying a TTL sets no expiration on cached items and will live until restart
-	// Valid time units are "ms", "s", "m", "h"
-	// In-memory cache is used if redis is not enabled
+	// cache_ttl is string parameter for caching ip addresses with their allowed/not allowed state.
+	// Not specifying a TTL sets no expiration on cached items and will live until restart.
+	// Valid time units are "ms", "s", "m", "h".
+	// In-memory cache is used if redis is not enabled.
 	CacheTTL time.Duration `json:"cache_ttl,omitempty"`
-	// radius is the distance of the geofence in kilometers
-	// If not supplied, will default to 0.0 kilometers
-	// 1.0 => 1.0 kilometers
+	// radius is the distance of the geofence in kilometers.
+	// If not supplied, will default to 0.0 kilometers.
+	// 1.0 => 1.0 kilometers.
 	Radius float64 `json:"radius"`
 	// allow_private_ip_addresses is a boolean for whether or not to allow private ip ranges
-	// such as 192.X, 172.X, 10.X, [::1] (localhost). Default is false
-	// Some cellular networks doing NATing with 172.X addresses, in which case, you may not want to allow
+	// such as 192.X, 172.X, 10.X, [::1] (localhost). Default is false.
+	// Some cellular networks doing NATing with 172.X addresses, in which case, you may not want to allow.
 	AllowPrivateIPAddresses bool `json:"allow_private_ip_addresses"`
-	// RedisEnabled uses redis for caching. Default is false
+	// redis_enabled uses redis for caching. Default is false.
 	RedisEnabled bool `json:"redis_enabled,omitempty"`
-	// RedisUsername is the username to connect to a redis instance. Default is ""
+	// redis_username is the username to connect to a redis instance. Default is "".
 	RedisUsername string `json:"redis_username,omitempty"`
-	// RedisPassword is the password to connect to a redis instance. Default is ""
+	// redis_password is the password to connect to a redis instance. Default is "".
 	RedisPassword string `json:"redis_password,omitempty"`
-	// RedisAddr is the address to connect to a redis instance. Default is localhost:6379
+	// redis_addr is the address to connect to a redis instance. Default is localhost:6379.
 	RedisAddr string `json:"redis_addr,omitempty"`
-	// RedisDB is the db id. Default is 0
+	// redis_db is the db id. Default is 0.
 	RedisDB int `json:"redis_db,omitempty"`
 }
 
