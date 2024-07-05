@@ -1,10 +1,11 @@
 # Visit https://goreleaser.com for documentation on how to customize this
 # behavior.
+version: 2
 before:
   hooks:
     - go mod tidy -compat=1.17
 builds:
   - skip: true
 changelog:
-  skip: false
+  disable: false
   sort: asc

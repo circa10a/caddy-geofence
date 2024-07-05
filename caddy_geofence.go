@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net"
 	"net/http"
+	"slices"
 	"time"
 
 	"github.com/caddyserver/caddy/v2"
@@ -139,14 +140,14 @@ func (cg CaddyGeofence) Validate() error {
 
 // ServeHTTP implements caddyhttp.MiddlewareHandler.
 func (cg CaddyGeofence) ServeHTTP(w http.ResponseWriter, r *http.Request, next caddyhttp.Handler) error {
-	// Get host address, can  contain a port so we make sure we strip that off
+	// Get host address. It can contain a port so we make sure to strip that off
 	remoteAddr, _, err := net.SplitHostPort(r.RemoteAddr)
 	if err != nil {
 		return err
 	}
 
 	// Check if ip address is in allowlist
-	inAllowlist := strInSlice(remoteAddr, cg.Allowlist)
+	inAllowlist := slices.Contains(cg.Allowlist, remoteAddr)
 
 	// Debug private address/allowlist rules
 	cg.logger.Debug(loggerNamespace,
@@ -178,16 +179,6 @@ func (cg CaddyGeofence) ServeHTTP(w http.ResponseWriter, r *http.Request, next c
 	}
 
 	return next.ServeHTTP(w, r)
-}
-
-// strInSlice returns true if string is in slice
-func strInSlice(str string, list []string) bool {
-	for _, item := range list {
-		if str == item {
-			return true
-		}
-	}
-	return false
 }
 
 // Interface guards

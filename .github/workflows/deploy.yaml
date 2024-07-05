@@ -14,11 +14,11 @@ jobs:
     outputs:
       tag: ${{ steps.tagging.outputs.new_tag }}
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
       with:
         fetch-depth: '0'
     - name: Install Go
-      uses: actions/setup-go@v3
+      uses: actions/setup-go@v5
     - name: Bump version and push tag
       uses: anothrNick/github-tag-action@1.61.0
       id: tagging
@@ -28,10 +28,10 @@ jobs:
         RELEASE_BRANCHES: main
         DEFAULT_BUMP: minor
     - name: Run GoReleaser
-      uses: goreleaser/goreleaser-action@v3
+      uses: goreleaser/goreleaser-action@v6
       with:
         version: latest
-        args: release --rm-dist
+        args: release --clean
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: GoReportCard
