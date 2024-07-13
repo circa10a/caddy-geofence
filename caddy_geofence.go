@@ -12,7 +12,7 @@ import (
 	"github.com/caddyserver/caddy/v2/caddyconfig/httpcaddyfile"
 	"github.com/caddyserver/caddy/v2/modules/caddyhttp"
 	"github.com/circa10a/go-geofence"
-	"github.com/go-redis/redis/v9"
+	"github.com/circa10a/go-geofence/cache"
 	"go.uber.org/zap"
 )
 
@@ -116,7 +116,7 @@ func (cg *CaddyGeofence) Provision(ctx caddy.Context) error {
 
 	// If redis is enabled, set the options for go-geofence to create the client
 	if cg.RedisEnabled {
-		geofenceConfig.RedisOptions = &redis.Options{
+		geofenceConfig.RedisOptions = &cache.RedisOptions{
 			Addr:     cg.RedisAddr,
 			Username: cg.RedisUsername,
 			Password: cg.RedisPassword,
